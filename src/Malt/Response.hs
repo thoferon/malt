@@ -1,5 +1,5 @@
 module Malt.Response (
-  Response,
+  Response(..),
   Code,
   Headers,
   Body,
@@ -10,12 +10,12 @@ import Data.List(lookup)
 
 class Response a where
   getCode   :: a -> Code
-  getHeader :: a -> String -> Maybe String
+  getHeader :: String -> a -> Maybe String
   getBody   :: a -> Body
 
-  setCode   :: a -> Code -> a
-  setHeader :: a -> String -> String -> a
-  setBody   :: a -> Body -> a
+  setCode   :: Code -> a -> a
+  setHeader :: String -> String -> a -> a
+  setBody   :: Body -> a -> a
 
 type Code    = Int
 type Headers = [(String, String)]
@@ -25,10 +25,10 @@ data SResponse = SResponse Code Headers Body
                  deriving(Show, Eq)
 
 instance Response SResponse where
-  getCode   (SResponse code _ _) = code
-  getHeader (SResponse _ headers _) name = lookup name headers
-  getBody   (SResponse _ _ body) = body
+  getCode        (SResponse code _ _)    = code
+  getHeader name (SResponse _ headers _) = lookup name headers
+  getBody        (SResponse _ _ body)    = body
 
-  setCode   (SResponse _ headers body) code = SResponse code headers body
+  setCode   code (SResponse _ headers body) = SResponse code headers body
   setHeader = undefined
-  setBody   (SResponse code headers _) body = SResponse code headers body
+  setBody   body (SResponse code headers _) = SResponse code headers body

@@ -1,6 +1,7 @@
 module Malt.Middleware (
   MiddlewareStack(..),
-  SMiddleware(..)
+  SMiddleware(..),
+  notFound
   ) where
 
 import Malt.Request
@@ -18,3 +19,6 @@ joinMiddlewares (Success reqresp) f = f reqresp
 joinMiddlewares InternalError     _ = InternalError
 
 type SMiddleware = (SRequest, SResponse) -> MiddlewareStack (SRequest, SResponse)
+
+notFound :: (Request a, Response b) => (a,b) -> MiddlewareStack (a,b)
+notFound (req,resp) = Success (req, setCode 404 . setBody "404 Not Found" $ resp)
